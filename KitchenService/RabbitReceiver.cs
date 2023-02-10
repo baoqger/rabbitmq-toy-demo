@@ -27,10 +27,10 @@ public class RabbitReceiver : IHostedService
         // declare exchange
         _channel.ExchangeDeclare(exchange: _rabbitSettings.ExchangeName, type: _rabbitSettings.ExchangeType);
         // declare a queue and generate the name
-        var queueName = _channel.QueueDeclare().QueueName;
-        Console.WriteLine("Debug: queue - ${0}", queueName);
+        _channel.QueueDeclare(_rabbitSettings.QueueName);
+        Console.WriteLine("Debug: queue - ${0}", _rabbitSettings.QueueName);
         // routing key is #.cookwaffle
-        _channel.QueueBind(queue: queueName, exchange: _rabbitSettings.ExchangeName, routingKey: "#.cookwaffle");
+        _channel.QueueBind(queue: _rabbitSettings.QueueName, exchange: _rabbitSettings.ExchangeName, routingKey: "order.cookwaffle");
         // create a consumer
         var consumerAsync = new AsyncEventingBasicConsumer(_channel);
         // message receive handler
@@ -38,15 +38,17 @@ public class RabbitReceiver : IHostedService
         {
             var body = ea.Body.ToArray(); // Get the message body from the EventArgs
             var message = Encoding.UTF8.GetString(body); // Decode the body into a string
+            Console.WriteLine("Receive message: {0}", message);
             var order = JsonSerializer.Deserialize<Order>(message);
 
             await _orderHub.Clients.All.SendAsync("new-order", order); // send to single client side
-            Console.WriteLine("Receive message: ${0}", message);
+            
             // rabbitmq message receive ack
             _channel.BasicAck(ea.DeliveryTag, false);
         };
         // start the consumption process.
-        _channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumerAsync);
+        // autoAck set to false
+        _channel.BasicConsume(queue: _rabbitSettings.QueueName, autoAck: false, consumer: consumerAsync);
     }
 
     public Task StartAsync(CancellationToken cancellationToken)

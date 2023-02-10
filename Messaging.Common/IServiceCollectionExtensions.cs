@@ -9,7 +9,7 @@ public static class IServiceCollectionExtensions
     // setup the connection to rabbitmq. Shared with the other two projects
     public static IServiceCollection SetUpRabbitMq(this IServiceCollection services, IConfiguration config)
     {
-        var configSection = config.GetSection("RabbitMQSettings");
+        var configSection = config.GetSection("RabbitMqSettings");
         var settings = new RabbitMqSettings();
         configSection.Bind(settings); // assignment property value by binding
         // add the settings for later use by other classes via injection

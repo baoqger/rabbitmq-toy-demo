@@ -5,4 +5,6 @@ public class RabbitMqSettings
     public string ExchangeName { get; set; }
     public string ExchangeType { get; set; }
 
+    public string QueueName { get; set; }
+
 }
