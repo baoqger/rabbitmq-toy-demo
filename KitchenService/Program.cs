@@ -33,6 +33,9 @@ builder.Services.AddResponseCompression(opts =>
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
+builder.Services.SetUpRabbitMq(builder.Configuration);
+builder.Services.AddHostedService<RabbitReceiver>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
