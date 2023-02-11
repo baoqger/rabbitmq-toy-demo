@@ -30,12 +30,15 @@ public class RabbitReceiver : IHostedService
         _channel.QueueDeclare(_rabbitSettings.QueueName);
         Console.WriteLine("Debug: queue - ${0}", _rabbitSettings.QueueName);
         // routing key is #.cookwaffle
-        _channel.QueueBind(queue: _rabbitSettings.QueueName, exchange: _rabbitSettings.ExchangeName, routingKey: "order.cookwaffle");
+        // * (star) can substitute for exactly one word.
+        // # (hash) can substitute for zero or more words.
+        _channel.QueueBind(queue: _rabbitSettings.QueueName, exchange: _rabbitSettings.ExchangeName, routingKey: "*.cookwaffle");
         // create a consumer
         var consumerAsync = new AsyncEventingBasicConsumer(_channel);
         // message receive handler
         consumerAsync.Received += async (_, ea) =>
         {
+            Thread.Sleep(5000);
             var body = ea.Body.ToArray(); // Get the message body from the EventArgs
             var message = Encoding.UTF8.GetString(body); // Decode the body into a string
             Console.WriteLine("Receive message: {0}", message);
@@ -44,6 +47,7 @@ public class RabbitReceiver : IHostedService
             await _orderHub.Clients.All.SendAsync("new-order", order); // send to single client side
             
             // rabbitmq message receive ack
+            // the second parameter is for ack multiple deliveries
             _channel.BasicAck(ea.DeliveryTag, false);
         };
         // start the consumption process.

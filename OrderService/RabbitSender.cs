@@ -21,6 +21,7 @@ public class RabbitSender
 
 		var body = Encoding.UTF8.GetBytes(message); // encode with UTF8
 
+		// basicPublish
 		_channel.BasicPublish(
 			exchange: _rabbitSettings.ExchangeName, // send to this exchange
 			routingKey: key,                        // routing key

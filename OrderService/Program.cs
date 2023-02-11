@@ -35,8 +35,7 @@ app.MapPost("/waffleOrder", (RabbitSender rabbitSender, [FromBody] Order order) 
         orderIdSeed++;
     }
     // send order message to rabbitmq
-    // routing key is: order.cookwaffle
-    rabbitSender.PublishMessage<Order>(order, "order.cookwaffle");
+    rabbitSender.PublishMessage<Order>(order, "order.cookwaffle"); // routing key is "order.cookwaffle"
 });
 
 app.Run();

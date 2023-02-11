@@ -7,6 +7,7 @@ namespace Messaging;
 public static class IServiceCollectionExtensions
 {
     // setup the connection to rabbitmq. Shared with the other two projects
+    // SetupRabbitMq is an extension method
     public static IServiceCollection SetUpRabbitMq(this IServiceCollection services, IConfiguration config)
     {
         var configSection = config.GetSection("RabbitMqSettings");
